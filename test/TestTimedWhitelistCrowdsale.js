@@ -2,7 +2,6 @@ import ether from 'zeppelin-solidity/test/helpers/ether';
 import { advanceBlock } from 'zeppelin-solidity/test/helpers/advanceToBlock';
 import { increaseTimeTo, duration } from 'zeppelin-solidity/test/helpers/increaseTime';
 import latestTime from 'zeppelin-solidity/test/helpers/latestTime';
-import EVMRevert from 'zeppelin-solidity/test/helpers/EVMRevert';
 
 const BigNumber = web3.BigNumber;
 
@@ -14,7 +13,7 @@ const TimedWhitelistCrowdsale = artifacts.require('TimedWhitelistCrowdsaleImpl')
 const MyCoralToken = artifacts.require('MyCoralToken');
 
 contract('TimedWhitelistCrowdsale', function ([owner, wallet, authorized, unauthorized, anotherAuthorized]) {
-  const rate = 1;
+  const rate = 1500;
   const value = ether(2);
 
   describe('single user whitelisting', function () {

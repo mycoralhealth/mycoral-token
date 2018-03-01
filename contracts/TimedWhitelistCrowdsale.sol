@@ -12,19 +12,6 @@ contract TimedWhitelistCrowdsale is WhitelistedCrowdsale, TimedCrowdsale {
 		return now > openingTime;
 	}
 
-	modifier onlyWhileNotClosed {
-    	require(now <= closingTime);
-    	_;
-  	}
-
-	// Would be used to transfer tokens that were prepurchased - WIP
-	function addBalanceToAddress(address _beneficiary, uint256 weiAmount) 
-		public onlyOwner onlyWhileNotClosed {
-	    uint256 tokens = _getTokenAmount(weiAmount);
-		TokenPurchase(msg.sender, _beneficiary, weiAmount, tokens);
-	    _processPurchase(_beneficiary, tokens);
-	}
-
 	modifier whitelistedOrStarted(address _beneficiary) {
 		require(((whitelist[_beneficiary]) || (now >= openingTime)) && (now <= closingTime));
 		_;
