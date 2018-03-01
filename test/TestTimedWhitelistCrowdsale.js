@@ -5,17 +5,19 @@ import latestTime from 'zeppelin-solidity/test/helpers/latestTime';
 
 const BigNumber = web3.BigNumber;
 
-require('chai')
+const should = require('chai')
   .use(require('chai-as-promised'))
+  .use(require('chai-bignumber')(BigNumber))
   .should();
+
 
 const TimedWhitelistCrowdsale = artifacts.require('TimedWhitelistCrowdsaleImpl');
 const MyCoralToken = artifacts.require('MyCoralToken');
 
 contract('TimedWhitelistCrowdsale', function ([owner, wallet, authorized, unauthorized, anotherAuthorized]) {
-  const rate = 1500;
+  const rate = new BigNumber(1500);
   const value = ether(2);
-
+  const expectedValue = rate.mul(value);
   describe('single user whitelisting', function () {
     before(async function () {
       // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
@@ -43,7 +45,11 @@ contract('TimedWhitelistCrowdsale', function ([owner, wallet, authorized, unauth
     describe('accepting payments whitelist only', function () {
       it('should accept payments to whitelisted (from whichever buyers)', async function () {
         await this.crowdsale.buyTokens(authorized, { value: value, from: authorized }).should.be.fulfilled;
+        let balance = await this.token.balanceOf(authorized);
+        balance.should.be.bignumber.equal(expectedValue);
         await this.crowdsale.buyTokens(authorized, { value: value, from: unauthorized }).should.be.fulfilled;
+        balance = await this.token.balanceOf(authorized);
+        balance.should.be.bignumber.equal(expectedValue.mul(2));
       });
 
       it('should reject payments to not whitelisted (from whichever buyers)', async function () {
@@ -84,8 +90,14 @@ contract('TimedWhitelistCrowdsale', function ([owner, wallet, authorized, unauth
 
       it('should accept payments to not whitelisted (from whichever buyers)', async function () {
         await this.crowdsale.send(value).should.be.fulfilled;
+        let balance = await this.token.balanceOf(owner);
+        balance.should.be.bignumber.equal(expectedValue);
         await this.crowdsale.buyTokens(unauthorized, { value: value, from: unauthorized }).should.be.fulfilled;
+        balance = await this.token.balanceOf(unauthorized);
+        balance.should.be.bignumber.equal(expectedValue);
         await this.crowdsale.buyTokens(unauthorized, { value: value, from: authorized }).should.be.fulfilled;
+        balance = await this.token.balanceOf(unauthorized);
+        balance.should.be.bignumber.equal(expectedValue.mul(2));
       });
 
       it('should accept payments to addresses removed from whitelist', async function () {
