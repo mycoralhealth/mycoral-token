@@ -26,11 +26,13 @@ contract TimedWhitelistCrowdsale is WhitelistedCrowdsale, TimedCrowdsale {
 	}
 
 	modifier whitelistedOrStarted(address _beneficiary) {
-		require((whitelist[_beneficiary]) || (now >= openingTime && now <= closingTime));
+		require(((whitelist[_beneficiary]) || (now >= openingTime)) && (now <= closingTime));
 		_;
 	}
 
 	function _preValidatePurchase(address _beneficiary, uint256 _weiAmount) internal 
 		whitelistedOrStarted(_beneficiary) {
+		require(_beneficiary != address(0));
+    	require(_weiAmount != 0);
 	}
 }
