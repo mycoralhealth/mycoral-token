@@ -22,13 +22,7 @@ module.exports = function(deployer) {
       MyCoralToken.address
     ).then(function(){
       coin = MyCoralToken.at(MyCoralToken.address);
-      coin.owner().then(function(owner) {
-        console.log("Original coin owner: " + owner);
-      })
       coin.transferOwnership(MyCoralCrowdsale.address);  
-      coin.owner().then(function(owner) {
-        console.log("New coin owner: " + owner);
-      })
     });
   });
 
