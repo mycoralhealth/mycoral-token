@@ -6,6 +6,7 @@ module.exports = function(deployer) {
   const endTime = startTime + 150; 
   const wallet = web3.eth.accounts[0];
   const rate = 7500;
+  const cap = 10000;
   deployer.deploy(MyCoralToken).then(function(){
     console.log("======== CONTRACT DEPLOYMENT =============");
     console.log("   Token address: " + MyCoralToken.address);
@@ -19,7 +20,8 @@ module.exports = function(deployer) {
       endTime,
       rate,
       wallet,
-      MyCoralToken.address
+      MyCoralToken.address,
+      cap
     ).then(function(){
       coin = MyCoralToken.at(MyCoralToken.address);
       coin.transferOwnership(MyCoralCrowdsale.address);  
