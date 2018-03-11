@@ -4,7 +4,7 @@ import "./TimedWhitelistCrowdsale.sol";
 import "zeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol";
 import "zeppelin-solidity/contracts/crowdsale/distribution/PostDeliveryCrowdsale.sol";
 import "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
-import "zeppelin-solidity/contracts/token/ERC20/CappedCrowdsale.sol";
+import "zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 
 contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitelistCrowdsale, CappedCrowdsale {
 
@@ -19,7 +19,6 @@ contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitel
   	}
 
   	function withdrawTokens() public cappedOrClosed() {
-    	require(cappedOrClosed());
     	uint256 amount = balances[msg.sender];
     	require(amount > 0);
     	balances[msg.sender] = 0;
