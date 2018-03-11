@@ -9,25 +9,25 @@ import "zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitelistCrowdsale, CappedCrowdsale {
 
 	modifier onlyWhileNotClosed {
-    	require(now <= closingTime);
-    	_;
-  	}
+   	require(now <= closingTime);
+  	_;
+	}
 
   	modifier cappedOrClosed() {
-  		require(hasClosed() || capReached());
-  		_;
-  	}
+ 		require(hasClosed() || capReached());
+ 		_;
+ 	}
 
-  	function withdrawTokens() public cappedOrClosed() {
-    	uint256 amount = balances[msg.sender];
-    	require(amount > 0);
-    	balances[msg.sender] = 0;
-    	_deliverTokens(msg.sender, amount);
-  	}
+ 	function withdrawTokens() public cappedOrClosed() {
+   	uint256 amount = balances[msg.sender];
+   	require(amount > 0);
+   	balances[msg.sender] = 0;
+   	_deliverTokens(msg.sender, amount);
+ 	}
 
 	function addBalanceToAddress(address _beneficiary, uint256 tokenAmount) 
 		public onlyOwner onlyWhileNotClosed {
-	    _processPurchase(_beneficiary, tokenAmount);
+    _processPurchase(_beneficiary, tokenAmount);
 	}
 
 
