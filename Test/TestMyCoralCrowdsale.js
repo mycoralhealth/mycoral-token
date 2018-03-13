@@ -17,7 +17,7 @@ const MyCoralToken = artifacts.require('MyCoralToken');
 contract('MyCoralCrowdsale', function ([owner, investor, wallet, purchaser, presale, whitelist, unauthorized]) {
   const rate = new BigNumber(1);
   const value = ether(2);
-
+  const limit = ether(10000000000);
   before(async function () {
     // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
     await advanceBlock();
@@ -30,7 +30,7 @@ contract('MyCoralCrowdsale', function ([owner, investor, wallet, purchaser, pres
     this.afterClosingTime = this.closingTime + duration.seconds(1);
     this.token = await MyCoralToken.new();
     this.crowdsale = await MyCoralCrowdsale.new(
-      this.openingTime, this.closingTime, rate, wallet, this.token.address
+      this.openingTime, this.closingTime, rate, wallet, this.token.address, limit
     );
     await this.token.transferOwnership(this.crowdsale.address);
     await this.crowdsale.addToWhitelist(whitelist).should.be.fulfilled;
@@ -121,5 +121,52 @@ contract('MyCoralCrowdsale', function ([owner, investor, wallet, purchaser, pres
       const balance = await this.token.balanceOf(investor);
       balance.should.be.bignumber.equal(value);
     });
+  })
+
+  describe('Maximum token limit', function() {
+    beforeEach(async function() {
+      this.token = await MyCoralToken.new();
+      const reduced_limit = ether(10);
+      this.crowdsale = await MyCoralCrowdsale.new(
+      this.openingTime, this.closingTime, rate, wallet, this.token.address, reduced_limit
+      );
+      await this.token.transferOwnership(this.crowdsale.address);
+      await this.crowdsale.addToWhitelist(whitelist).should.be.fulfilled;
+    })
+    it('check to make sure that you cannot make purchases after limit', async function() {
+      await this.crowdsale.buyTokens(whitelist, { value: ether(10), from: purchaser}).should.be.fulfilled;
+      await this.crowdsale.buyTokens(whitelist, { value: ether(10), from: purchaser}).should.be.rejected;
+      let prebalance = await this.crowdsale.balances(whitelist);
+      prebalance.should.be.bignumber.equal(ether(10));
+    })
+    it('make sure you cannot buy over the limit', async function() {
+      await this.crowdsale.buyTokens(whitelist, { value: ether(100), from: purchaser}).should.be.rejected;
+      let prebalance = await this.crowdsale.balances(whitelist);
+      prebalance.should.be.bignumber.equal(ether(0));
+    })
+    it('withdraw becomes available once you sell out of tokens', async function() {
+      await this.crowdsale.buyTokens(whitelist, { value: ether(10), from: purchaser}).should.be.fulfilled;
+      await this.crowdsale.withdrawTokens({ from: whitelist });
+      const balance = await this.token.balanceOf(whitelist);
+      balance.should.be.bignumber.equal(ether(10));
+    })
+    it('withdraw becomes available once you sell out of tokens, will not lose balance on fail', async function() {
+      await this.crowdsale.buyTokens(whitelist, { value: ether(10), from: purchaser}).should.be.fulfilled;
+      await this.crowdsale.withdrawTokens({ from: whitelist, gas: 60000 }).should.be.rejectedWith(EVMRevert);
+      let prebalance = await this.crowdsale.balances(whitelist);
+      prebalance.should.be.bignumber.equal(ether(10));
+      let balance = await this.token.balanceOf(whitelist);
+      balance.should.be.bignumber.equal(ether(0));
+      await this.crowdsale.withdrawTokens({ from: whitelist});
+      balance = await this.token.balanceOf(whitelist);
+      balance.should.be.bignumber.equal(ether(10));
+    })
+    it('withdraw is unavailable', async function() {
+      await this.crowdsale.buyTokens(whitelist, { value: ether(5), from: purchaser}).should.be.fulfilled;
+      await this.crowdsale.withdrawTokens({ from: whitelist }).should.be.rejected;
+      const balance = await this.token.balanceOf(whitelist);
+      balance.should.be.bignumber.equal(ether(0));
+    })
+    
   })
 });

@@ -19,7 +19,6 @@ contract('TimedWhitelistCrowdsale', function ([owner, wallet, authorized, unauth
   const value = ether(2);
   const expectedValue = rate.mul(value);
   before(async function () {
-    // Advance to the next block to correctly read time in the solidity "now" function interpreted by testrpc
     await advanceBlock();  
   });
   beforeEach(async function () {
