@@ -167,6 +167,14 @@ contract('MyCoralCrowdsale', function ([owner, investor, wallet, purchaser, pres
       const balance = await this.token.balanceOf(whitelist);
       balance.should.be.bignumber.equal(ether(0));
     })
-    
+  })
+  it ('Check the beneficiary lookup', async function() {
+    await this.crowdsale.addToWhitelist(purchaser).should.be.fulfilled;
+    await this.crowdsale.buyTokens(whitelist, { value: ether(1), from :whitelist}).should.be.fulfilled;
+    await this.crowdsale.buyTokens(purchaser, { value: ether(1), from :purchaser}).should.be.fulfilled;
+    let firstAddress = await this.crowdsale.beneficiaryLookup(0x0)
+    firstAddress.should.be.equal(purchaser);
+    let secondAddress = await this.crowdsale.beneficiaryLookup(firstAddress);
+    secondAddress.should.be.equal(whitelist)
   })
 });

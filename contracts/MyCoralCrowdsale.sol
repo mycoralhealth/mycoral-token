@@ -23,7 +23,7 @@ contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitel
   *  Used to keep track of all the token beneficiaries
   *  during the crowdsale for future delivery.
   **/
-  mapping (address => address) beneficiaryLookup;
+  mapping (address => address) public beneficiaryLookup;
 
   function _addLookup(address _beneficiary) internal {
     beneficiaryLookup[_beneficiary] = beneficiaryLookup[0x0];
