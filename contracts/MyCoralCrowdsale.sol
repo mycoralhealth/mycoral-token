@@ -20,6 +20,22 @@ import "zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitelistCrowdsale, CappedCrowdsale {
 
   /**
+  *  Used to keep track of all the token beneficiaries
+  *  during the crowdsale for future delivery.
+  **/
+  mapping (address => address) beneficiaryLookup;
+
+  function _addLookup(address _beneficiary) internal {
+    beneficiaryLookup[_beneficiary] = beneficiaryLookup[0x0];
+    beneficiaryLookup[0x0] = _beneficiary;
+  }
+
+  function _processPurchase(address _beneficiary, uint256 _tokenAmount) internal {
+    _addLookup(_beneficiary);
+    super._processPurchase(_beneficiary, _tokenAmount);
+  }
+
+  /**
   * Verifies that the closing time hasn't
   * been reached. 
   **/
@@ -47,6 +63,10 @@ contract MyCoralCrowdsale is MintedCrowdsale, PostDeliveryCrowdsale, TimedWhitel
    	balances[msg.sender] = 0;
    	_deliverTokens(msg.sender, amount);
  	}
+
+  function getAddressesWithBalance() public onlyOwner {
+
+  }
 
   /**
   * Assigns tokens to an address, tokens assigned in this way do 
