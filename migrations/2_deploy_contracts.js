@@ -6,7 +6,7 @@ module.exports = function(deployer) {
   const endTime = startTime + 150; 
   const wallet = web3.eth.accounts[0];
   const rate = 7500;
-  const cap = 10000;
+  const cap = web3.toWei(50, "ether");
   deployer.deploy(MyCoralToken).then(function(){
     console.log("======== CONTRACT DEPLOYMENT =============");
     console.log("   Token address: " + MyCoralToken.address);
