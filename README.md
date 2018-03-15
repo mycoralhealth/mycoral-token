@@ -3,7 +3,9 @@ The crowdsale contract is a timed and whitelisted contract that delivers tokens 
 
 ## Phases: ##
 Phase 1 - delivering private sale tokens, assign tokens using the addBalanceToAddress function 
+
 Phase 2 - We can bulk add whitelisted addresses using MyCoralCrowdSale.addManyToWhitelist([addressList]) and they will be able to buy tokens before the crowdsale "startTime"
+
 Phase 3 - Once the start time passes anyone is able to buy tokens from the crowdsale until the end time
 
 ### Installation/Testing: ###
